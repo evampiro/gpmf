@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "ffmpeg": "^0.0.4",
+    "gopro-telemetry": "^1.1.37",
+    "gpmf-extract": "^0.2.5"
+  }
+}
