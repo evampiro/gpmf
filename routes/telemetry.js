@@ -9,8 +9,9 @@ const progress = percent => console.log(`${percent*100}% processed`);
 
 router.post("/",async(req,res,next)=>{
 
-    
-    const file = fs.readFileSync('sample/GOPR0001-small.mp4');
+    try{
+        console.log(req.body);
+        const file = fs.readFileSync('sample/GOPR0001-small.mp4');
     // const stream = fs.createReadStream('sample/mid-sample.mp4');
     
     // stream.on('data',_buff=>{
@@ -38,6 +39,12 @@ router.post("/",async(req,res,next)=>{
       });
     })
     .catch(error => console.error(error));
+    }
+    catch(e)
+    {
+        return res.status(500).json({"message":"Server Error: "+e});
+    }
+    
 });
 
 module.exports = router;

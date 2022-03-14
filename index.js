@@ -1,42 +1,29 @@
-// const express = require('express');
+ 
 // const mongoose = require('mongoose');
 //const dotenv = require("dotenv");
 // set up our express app
-//const app = express();
-// const cors = require("cors");
 
 
-const gpmfExtract = require('gpmf-extract');
-const goproTelemetry = require(`gopro-telemetry`);
-const fs = require('fs');
-const progress = percent => console.log(`${percent*100}% processed`);
+const cors = require("cors");
+const express = require('express');
 
- const file = fs.readFileSync('sample/GOPR0001-small.mp4');
-// const stream = fs.createReadStream('sample/mid-sample.mp4');
 
-// stream.on('data',_buff=>{
-//     gpmfExtract(_buff)
-//     .then(extracted => {
-//       goproTelemetry(extracted, {}, telemetry => {
-//         fs.writeFileSync('output_path.json', JSON.stringify(telemetry));
-//         console.log('Telemetry saved as JSON');
-//       });
-//     })
-//     .catch(error => console.error(error));
-// });
-console.log("Extraction started!");
-gpmfExtract(file,{progress})
-.then(extracted => {
-  console.log("Extraction Done!");
+const app = express();
 
-  goproTelemetry(extracted, {stream:['GPS5'], repeatSticky: true,smooth:3,progress}, telemetry => {
-    
+var http = require('http');
+app.use(express.json());
+app.use(cors({ origin: '*' }));
+app.use(express.static('public'));
 
-    var data=telemetry['1']['streams']['GPS5']["samples"];
-    // console.log(data);
-     fs.writeFileSync('output_path.json', JSON.stringify(data));
-    console.log('Telemetry saved as JSON');
-  });
-})
-.catch(error => console.error(error));
+const telemetryRoute = require("./routes/telemetry");
+
+app.use("/api/telemetry", telemetryRoute); 
+
+
+var httpServer = http.createServer(app);
+httpServer.listen(process.env.PORT || 4000, "0.0.0.0", function() {
+  console.log('Ready to Go!');
+
+});
+ 
 
