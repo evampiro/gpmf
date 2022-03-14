@@ -11,7 +11,7 @@ const goproTelemetry = require(`gopro-telemetry`);
 const fs = require('fs');
 const progress = percent => console.log(`${percent*100}% processed`);
 
- const file = fs.readFileSync('sample/long-new-sample.mp4');
+ const file = fs.readFileSync('sample/GOPR0001-small.mp4');
 // const stream = fs.createReadStream('sample/mid-sample.mp4');
 
 // stream.on('data',_buff=>{

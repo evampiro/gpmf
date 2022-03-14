@@ -1,7 +1,11 @@
 {
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
     "ffmpeg": "^0.0.4",
     "gopro-telemetry": "^1.1.37",
-    "gpmf-extract": "^0.2.5"
+    "gpmf-extract": "^0.2.5",
+    "http": "^0.0.1-security",
+    "nodemon": "^2.0.15"
   }
 }
