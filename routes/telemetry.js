@@ -7,32 +7,43 @@ const fs = require('fs');
 const progress = percent => console.log(`${percent*100}% processed`);
 
 
-router.get("/",async(req,res,next)=>{
+router.post("/single",async(req,res,next)=>{
 
-  try{
-    const file = fs.readFileSync('telemetry.mp4');
+  if(req.body.isNotEmpty)
+  {
+    var element=req.body;
+    try{
+      const file = fs.readFileSync(element.path+element.name+'.'+element.mime);
+    
+      gpmfExtract(file,{progress}).then(extracted=>{
+        goproTelemetry(extracted, { stream:['GPS5'],repeatSticky: true,smooth:3,progress}, ).then(telemetry => {
+          
+      
+          var data=telemetry['1']['streams']['GPS5']["samples"];
+    
+          // console.log(data);
+          fs.writeFileSync(element.path+element.name+'.json', JSON.stringify(data));
+          console.log('Telemetry saved as JSON');
+          console.log("here");
+          return res.status(200);
+        });
+      });
+      
   
-    gpmfExtract(file,{progress}).then(extracted=>{
-      goproTelemetry(extracted, { stream:['GPS5'],repeatSticky: true,smooth:3,progress}, telemetry => {
-        
-    
-         var data=telemetry['1']['streams']['GPS5']["samples"];
-   
-         // console.log(data);
-          fs.writeFileSync('data.json', JSON.stringify(data));
-         console.log('Telemetry saved as JSON');
-       });
-    });
-    
-    return res.status(200);
-
+  
+    }
+    catch(e)
+    { 
+      console.log(e);
+      return res.status(400);
+     
+    }
   }
-  catch(e)
-  { 
-    console.log(e);
+  else
+  {
     return res.status(400);
-   
   }
+   
 });
 router.post("/",async(req,res,next)=>{
 
@@ -55,12 +66,14 @@ router.post("/",async(req,res,next)=>{
         // console.log(data);
          fs.writeFileSync(element.path+element.name+'.json', JSON.stringify(data));
         console.log('Telemetry saved as JSON');
+       
+        return res.status(200);
       });
     })
     .catch(error => console.error(error));
     return res.status(400);
        });
-      
+       console.log("here");
       return res.status(200);
 
         
