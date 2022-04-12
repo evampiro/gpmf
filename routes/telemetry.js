@@ -7,41 +7,46 @@ const fs = require('fs');
 const progress = percent => console.log(`${percent*100}% processed`);
 
 
+router.get("/check",async(req,res,next)=>{
+
+  return res.status(200).json({});
+});
 router.post("/single",async(req,res,next)=>{
 
-  if(req.body.isNotEmpty)
+  if(Object.keys(req.body).length)
   {
     var element=req.body;
+   
     try{
       const file = fs.readFileSync(element.path+element.name+'.'+element.mime);
     
-      gpmfExtract(file,{progress}).then(extracted=>{
-        goproTelemetry(extracted, { stream:['GPS5'],repeatSticky: true,smooth:3,progress}, ).then(telemetry => {
-          
-      
-          var data=telemetry['1']['streams']['GPS5']["samples"];
+      var extracted=await gpmfExtract(file,{});
+      var json=await goproTelemetry(extracted, { stream:['GPS5'],repeatSticky: true,smooth:3}, );
     
-          // console.log(data);
-          fs.writeFileSync(element.path+element.name+'.json', JSON.stringify(data));
-          console.log('Telemetry saved as JSON');
-          console.log("here");
-          return res.status(200);
-        });
-      });
-      
+      var data=json['1']['streams']['GPS5']["samples"];
+    
+      // console.log(data);
+      var name=element.name.replace("-small",'');
+     
+      fs.writeFileSync(element.path+name+'.json', JSON.stringify(data));
+      //console.log('Telemetry saved as JSON');
+  
+       
+       return res.status(200).json({"message":"done"});
   
   
     }
     catch(e)
     { 
-      console.log(e);
-      return res.status(400);
-     
+      console.log("error"+e);
+    
+      return res.status(400).json({"message":e});
     }
   }
   else
   {
-    return res.status(400);
+   
+    return res.status(401).json({"message":"Empty Object"});
   }
    
 });
